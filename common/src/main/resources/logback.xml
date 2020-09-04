@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+    <property name="log.dir" value="../project-log" />
+    <timestamp key="ymd" datePattern="yyyy-MM-dd"/>
+    <property name="moduleName" value="tocc"/>
+    <timestamp key="bySecond" datePattern="yyyyMMdd'-'HHmmss"/>
+    <property name="CONSOLE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}|%highlight(%level)|${moduleName}|%yellow(%thread)|%blue(%logger{0}:%line)|%msg%n"/>
+    <property name="FILE_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS}|%level|${moduleName}|%thread|%logger{0}:%line|%msg%n"/>
+    <!-- 文档保留天数 -->
+    <property name="maxHistory" value="15"/>
+    <!-- 文档保留总大小 -->
+    <property name="totalSizeCap" value="10GB"/>
+    <!-- 日志文件大小 -->
+    <property name="maxFileSize" value="100MB"/>
+    <!--限制的日志-->
+    <logger name="org.apache.kafka.clients.producer.ProducerConfig" level="WARN"/>
+    <logger name="org.apache.kafka.clients.consumer.ConsumerConfig" level="WARN"/>
+    <logger name="org.apache.kafka.clients.admin.AdminClientConfig" level="WARN"/>
+    <logger name="org.apache.kafka.common.utils.AppInfoParser" level="WARN"/>
+    <logger name="org.apache.avro.ipc.netty.NettyServer" level="WARN"/>
+    <logger name="com.client.DataServer" level="WARN"/>
+    <logger name="com.client.SessionManager" level="WARN"/>
+
+    <!-- 控制台输出 [%yellow(%thread)] -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!--ROLLING_FILE  [%thread]-->
+    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!--日志名称，如果没有File 属性，那么只会使用FileNamePattern的文件路径规则-->
+        <file>${log.dir}/my.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--文件路径,定义了日志的切分方式——把每一天的日志归档到一个文件中,以防止日志填满整个磁盘空间-->
+            <FileNamePattern>${log.dir}/${appName}-${moduleName}.log.%d{yyyy-MM-dd}.%i</FileNamePattern>
+            <!--只保留最近天数的日志-->
+            <maxHistory>${maxHistory}</maxHistory>
+            <!--用来指定日志文件的上限大小，那么到了这个值，就会删除旧的日志-->
+            <totalSizeCap>${totalSizeCap}</totalSizeCap>
+            <maxFileSize>${maxFileSize}</maxFileSize>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>${maxFileSize}</MaxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>${FILE_PATTERN}</pattern>
+        </encoder>
+    </appender>
+    <root level="INFO">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLING_FILE" />
+    </root>
+</configuration>
