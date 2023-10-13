@@ -25,6 +25,7 @@ object SparkExample extends SparkJob {
 
     result.show(false)
 
+
     spark.stop()
   }
 }
