@@ -15,6 +15,11 @@ trait Sparking extends Logging {
   Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.WARN)
   Logger.getLogger("org.apache.kafka.clients.consumer").setLevel(Level.WARN)
 
+  def setLogLevel(levelStr: String): Unit = {
+    val level = Level.toLevel(levelStr)
+    Logger.getRootLogger.setLevel(level)
+  }
+
   val conf: SparkConf = new SparkConf()
     .set("spark.serializer", classOf[KryoSerializer].getName)
     .set("spark.extraListeners", classOf[SparkCoreListener].getName)
@@ -25,7 +30,7 @@ trait Sparking extends Logging {
     .set("spark.sql.crossJoin.enabled", "true")
     .set("spark.debug.maxToStringFields", "1000")
     .set("spark.sql.parquet.mergeSchema", "true")
-    .set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation", "true")
+//    .set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation", "true")
     .set("spark.hadoop.io.compression.codecs", "org.apache.hadoop.io.compress.DefaultCodec")
     .setAppName(this.getClass.getName.stripSuffix("$"))
 
@@ -55,6 +60,7 @@ trait Sparking extends Logging {
    */
   def useJvmProfiler(metricInterval: Long = 10000): Unit = {
     warn("开启 JvmProfiler")
+    // /opt/spark/jars/jvm-profiler-1.0.0.jar 这是插件包的位置
     conf.set("spark.executor.extraJavaOptions",
       s"-javaagent:/opt/spark/jars/jvm-profiler-1.0.0.jar=reporter=com.uber.profiling.reporters.KafkaOutputReporter,metricInterval=$metricInterval,brokerList=kafka001:9092,topicPrefix=spark_executor_jvm_profiler")
   }
@@ -77,10 +83,11 @@ trait Sparking extends Logging {
 
   /**
    * 通过指定 hive 的 metastore.uris 来创建 SparkSession
+   *
    * @param uris hive.metastore.uris
    * @return
    */
-  def getSparkSession(uris: Option[String]): SparkSession = {
+  def getSparkSession(uris: Option[String] = Some(ConfigsUtil.HIVE_METASTORES_URL)): SparkSession = {
     val builder: SparkSession.Builder = SparkSession.builder().config(conf)
     if (uris.isDefined) {
       builder

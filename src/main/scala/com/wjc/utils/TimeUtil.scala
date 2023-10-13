@@ -2,7 +2,7 @@ package com.wjc.utils
 
 import java.text.SimpleDateFormat
 
-import org.joda.time.{DateTime, Duration}
+import org.joda.time.{DateTime, Duration, Interval}
 import org.joda.time.format.DateTimeFormat
 
 /**
@@ -47,5 +47,21 @@ object TimeUtil {
     val startDate: DateTime = DateTime.parse(a, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     val endDate: DateTime = DateTime.parse(b, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"))
     Math.abs(new Duration(startDate, endDate).getStandardSeconds)
+  }
+
+  def getDateInterVal(start: DateTime, end: DateTime): String = {
+    val interval = new Interval(start.getMillis, end.getMillis).toPeriod
+    if(interval.getDays>0){
+      s"${interval.getDays}天 ${interval.getHours}小时 ${interval.getMinutes}分钟${interval.getSeconds}秒${interval.getMillis}毫秒"
+    }else if (interval.getHours>0){
+      s"${interval.getHours}小时 ${interval.getMinutes}分钟${interval.getSeconds}秒${interval.getMillis}毫秒"
+    }else if (interval.getMinutes>0){
+      s"${interval.getMinutes}分钟${interval.getSeconds}秒${interval.getMillis}毫秒"
+    }else if (interval.getSeconds>0){
+      s"${interval.getSeconds}秒${interval.getMillis}毫秒"
+    }else{
+      s"${interval.getMillis}毫秒"
+    }
+
   }
 }
