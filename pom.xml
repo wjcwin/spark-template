@@ -6,12 +6,8 @@
 
     <groupId>com.wjc.spark.template</groupId>
     <artifactId>spark-template</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
     <version>2.0-SNAPSHOT</version>
-    <modules>
-        <module>common</module>
-        <module>process</module>
-    </modules>
 
 
     <properties>
@@ -420,9 +416,38 @@
             <version>4.0.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+
+
     </dependencies>
 
+    <profiles>
+        <!--开发环境-->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+            </properties>
+        </profile>
+        <!--生产环境-->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+
     <build>
+        <finalName>spark-job</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
