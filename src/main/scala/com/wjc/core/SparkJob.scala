@@ -2,6 +2,7 @@ package com.wjc.core
 
 import com.wjc.utils.TimeUtil
 import org.apache.commons.lang3.time.StopWatch
+import org.apache.spark.sql.SparkSession
 import org.joda.time.DateTime
 
 /**
@@ -11,7 +12,9 @@ import org.joda.time.DateTime
  */
 trait SparkJob extends Sparking {
   private val startTime = new DateTime()
-  val stopWatch: StopWatch = StopWatch.createStarted()
+  private val stopWatch: StopWatch = StopWatch.createStarted()
+  val spark:SparkSession=getSparkSession()
+  import spark.implicits._
   def main(args: Array[String]): Unit = {
     logStarting()
     handle(args)
@@ -26,13 +29,14 @@ trait SparkJob extends Sparking {
   /**
    * 打印任务开始日志
    */
-  def logStarting(): Unit = {
+  private def logStarting(): Unit = {
     warn(s">>>>>任务开始时间:${startTime.toString("yyyy-MM-dd HH:mm:ss.SSS")}")
   }
+
   /**
    * 打印任务结束日志
    */
-  def logEnding(): Unit = {
+  private def logEnding(): Unit = {
     val endTime = new DateTime()
     warn(s"<<<<<任务开始时间:${startTime.toString("yyyy-MM-dd HH:mm:ss.SSS")}")
     warn(s"<<<<<任务结束时间: ${endTime.toString("yyyy-MM-dd HH:mm:ss.SSS")}")
