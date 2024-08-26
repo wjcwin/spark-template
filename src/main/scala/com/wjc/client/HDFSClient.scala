@@ -5,7 +5,7 @@ import java.net.URI
 
 import com.wjc.core.{Borrow, Logging}
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileStatus, FileSystem, Path}
+import org.apache.hadoop.fs.{FSDataInputStream, FileStatus, FileSystem, Path}
 import org.apache.hadoop.io.IOUtils
 import org.apache.spark.SparkContext
 import org.joda.time.format.DateTimeFormat
@@ -48,16 +48,21 @@ class HDFSClient(func: () => FileSystem) extends Borrow with Logging with Serial
     }.filter(x => FileSystem.get(sc.hadoopConfiguration).exists(new Path(x))).mkString(",")
   }
 
-  def exists(path:String):Boolean={
+  def exists(path: String): Boolean = {
     fs.exists(new Path(path))
   }
 
-  def exists(path:Path):Boolean={
+  def exists(path: Path): Boolean = {
     fs.exists(path)
   }
 
-  def listStatus(path:Path): Array[FileStatus] ={
+  def listStatus(path: Path): Array[FileStatus] = {
     fs.listStatus(path)
+  }
+
+
+  def open(path: Path): FSDataInputStream = {
+    fs.open(path)
   }
 }
 
@@ -66,6 +71,7 @@ object HDFSClient extends Logging {
   def apply(url: String, conf: Configuration): HDFSClient = {
     val func = () => {
       val fs = FileSystem.get(URI.create(url), conf)
+      //关闭hdfs客户端的钩子函数在使用云上对象存储时会存在同时关闭文件系统造成死锁
       sys.addShutdownHook {
         warn("Execute hook thread: HDFSSink")
         fs.close()
@@ -75,18 +81,4 @@ object HDFSClient extends Logging {
     new HDFSClient(func)
   }
 
-  def main(args: Array[String]): Unit = {
-
-    val conf = new Configuration()
-    //以nameservices 的方式初始化 FileSystem（HDFS HA）
-    conf.set("fs.defaultFS", "hdfs://hikbigdata")
-    conf.set("dfs.nameservices", "bigdata")
-    conf.set("dfs.ha.namenodes.nameservices", "nn1,nn2")
-    conf.set("dfs.namenode.rpc-address.nameservices.nn1", "10.197.236.211:8020")
-    conf.set("dfs.namenode.rpc-address.nameservices.nn2", "10.197.236.212:8020")
-    conf.set("dfs.client.failover.proxy.provider.chkjbigdata", "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider")
-    conf.setBoolean("dfs.support.append", true)
-    val sink = HDFSClient("hdfs://10.197.236.211:8020", conf)
-    sink.deleteFile("/test/a", boolean = true)
-  }
 }

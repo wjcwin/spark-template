@@ -12,8 +12,12 @@ trait Sparking extends Logging {
 
   // 屏蔽不必要的日志 ,在终端上显示需要的日志
   Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
+  Logger.getLogger("org.spark_project").setLevel(Level.WARN)
   Logger.getLogger("org.eclipse.jetty.server").setLevel(Level.WARN)
   Logger.getLogger("org.apache.kafka.clients.consumer").setLevel(Level.WARN)
+  Logger.getLogger("org.apache.hudi").setLevel(Level.WARN)
+  Logger.getLogger("org.apache.hadoop").setLevel(Level.WARN)
+  Logger.getLogger("org.apache.parquet").setLevel(Level.WARN)
 
   def setLogLevel(levelStr: String): Unit = {
     val level = Level.toLevel(levelStr)
@@ -30,7 +34,7 @@ trait Sparking extends Logging {
     .set("spark.sql.crossJoin.enabled", "true")
     .set("spark.debug.maxToStringFields", "1000")
     .set("spark.sql.parquet.mergeSchema", "true")
-//    .set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation", "true")
+    //    .set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation", "true")
     .set("spark.hadoop.io.compression.codecs", "org.apache.hadoop.io.compress.DefaultCodec")
     .setAppName(this.getClass.getName.stripSuffix("$"))
 
@@ -88,6 +92,8 @@ trait Sparking extends Logging {
    * @return
    */
   def getSparkSession(uris: Option[String] = Some(ConfigsUtil.HIVE_METASTORES_URL)): SparkSession = {
+    println("SparkConf参数为：")
+    println(conf.getAll.mkString("\n"))
     val builder: SparkSession.Builder = SparkSession.builder().config(conf)
     if (uris.isDefined) {
       builder

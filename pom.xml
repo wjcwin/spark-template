@@ -16,9 +16,57 @@
         <scala.binary.version>2.12</scala.binary.version>
         <spark.version>3.4.0</spark.version>
         <hdfs.version>3.2.0</hdfs.version>
+        <hudi.version>0.5.3</hudi.version>
     </properties>
 
+
     <dependencies>
+
+        <dependency>
+            <groupId>com.qcloud</groupId>
+            <artifactId>cos_api-bundle</artifactId>
+            <version>5.6.137.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.qcloud.cos/hadoop-cos -->
+        <dependency>
+            <groupId>com.qcloud.cos</groupId>
+            <artifactId>hadoop-cos</artifactId>
+            <version>3.3.0-8.3.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jaxb-api</artifactId>
+                    <groupId>javax.xml.bind</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>commons-logging</artifactId>
+                    <groupId>commons-logging</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.binary.version}</artifactId>
+            <version>3.2.17</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.hudi</groupId>
+            <artifactId>hudi-spark-bundle_${scala.binary.version}</artifactId>
+            <version>${hudi.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
@@ -300,10 +348,10 @@
                     <artifactId>commons-text</artifactId>
                     <groupId>org.apache.commons</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>guava</artifactId>
-                    <groupId>com.google.guava</groupId>
-                </exclusion>
+<!--                <exclusion>-->
+<!--                    <artifactId>guava</artifactId>-->
+<!--                    <groupId>com.google.guava</groupId>-->
+<!--                </exclusion>-->
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
@@ -343,6 +391,10 @@
                 <exclusion>
                     <artifactId>jackson-core</artifactId>
                     <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>okio</artifactId>
+                    <groupId>com.squareup.okio</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -390,6 +442,12 @@
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>2.9.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.8.2</version>
         </dependency>
 
         <dependency>
@@ -472,6 +530,8 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.14.2</version>
         </dependency>
+
+
 
     </dependencies>
 
